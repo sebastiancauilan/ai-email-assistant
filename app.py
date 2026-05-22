@@ -46,33 +46,33 @@ def get_creds():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_config(
-    {
-        "installed": {
-            "client_id": st.secrets["GOOGLE_CLIENT_ID"],
-            "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"]
-        }
-    },
-    SCOPES
-)
+                {
+                    "installed": {
+                        "client_id": st.secrets["GOOGLE_CLIENT_ID"],
+                        "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
+                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                        "token_uri": "https://oauth2.googleapis.com/token",
+                        "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"]
+                    }
+                },
+                SCOPES
+            )
 
-auth_url, _ = flow.authorization_url(prompt="consent")
-st.link_button("Authorize Gmail", auth_url)
+            auth_url, _ = flow.authorization_url(prompt="consent")
+            st.link_button("Authorize Gmail", auth_url)
 
-code = st.text_input("Paste authorization code here")
+            code = st.text_input("Paste authorization code here")
 
-if not code:
-    st.stop()
+            if not code:
+                st.stop()
 
-flow.fetch_token(code=code)
-creds = flow.credentials
+            flow.fetch_token(code=code)
+            creds = flow.credentials
 
-with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
+            with open("token.pickle", "wb") as token:
+                pickle.dump(creds, token)
 
-return creds
+    return creds
 
 
 # ---------------- FETCH + PROCESS EMAILS ----------------
