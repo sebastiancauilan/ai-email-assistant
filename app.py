@@ -74,7 +74,7 @@ def get_creds():
 
     return creds
 
-
+st.write(f"Calling AI for: {subject}")
 # ---------------- FETCH + PROCESS EMAILS ----------------
 def fetch_emails():
     creds = get_creds()
