@@ -45,11 +45,29 @@ def get_creds():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json",
-                SCOPES
-            )
-            creds = flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_config(
+    {
+        "installed": {
+            "client_id": st.secrets["GOOGLE_CLIENT_ID"],
+            "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"]
+        }
+    },
+    SCOPES
+)
+
+auth_url, _ = flow.authorization_url(prompt="consent")
+st.link_button("Authorize Gmail", auth_url)
+
+code = st.text_input("Paste authorization code here")
+
+if not code:
+    st.stop()
+
+flow.fetch_token(code=code)
+creds = flow.credentials
 
         with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
