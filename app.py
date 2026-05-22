@@ -15,7 +15,7 @@ st.title("AI Email Assistant Dashboard")
 st.markdown("AI Email Assistant — drafts replies for unread emails (review before sending)")
 st.caption("Review, approve, and generate AI-powered email replies")
 
-client = OpenAI()
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 # ---------------- SESSION STATE ----------------
@@ -46,19 +46,22 @@ def get_creds():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_config(
-                {
-                    "installed": {
-                        "client_id": st.secrets["GOOGLE_CLIENT_ID"],
-                        "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
-                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                        "token_uri": "https://oauth2.googleapis.com/token",
-                        "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"]
-                    }
-                },
-                SCOPES
-            )
+    {
+        "web": {
+            "client_id": st.secrets["GOOGLE_CLIENT_ID"],
+            "client_secret": st.secrets["GOOGLE_CLIENT_SECRET"],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": ["https://ai-email-assistant-mdquphv63st8mjoo5yvfku.streamlit.app"]
+        }
+    },
+    SCOPES
+)
 
-            auth_url, _ = flow.authorization_url(prompt="consent")
+            auth_url, _ = flow.authorization_url(
+    prompt="consent",
+    redirect_uri="https://ai-email-assistant-mdquphv63st8mjoo5yvfku.streamlit.app"
+)
             st.link_button("Authorize Gmail", auth_url)
 
             code = st.text_input("Paste authorization code here")
@@ -81,12 +84,11 @@ def fetch_emails():
 
     results = service.users().messages().list(
         userId="me",
-        maxResults=1,
+        maxResults=5,
         q="is:unread"
     ).execute()
 
     messages = results.get("messages", [])
-
     processed = []
 
     for msg in messages:
@@ -111,6 +113,8 @@ From: {sender}
 Subject: {subject}
 Body: {snippet}
 """
+
+        st.write(f"Calling AI for: {subject}")
 
         response = client.responses.create(
             model="gpt-5.2",
@@ -144,7 +148,6 @@ Email:
         st.session_state.seen_ids.add(msg["id"])
 
     return processed, service
-
 
 # ---------------- RUN BUTTON ----------------
 if st.button("Scan Inbox"):
