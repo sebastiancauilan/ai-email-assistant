@@ -69,7 +69,7 @@ if not code:
 flow.fetch_token(code=code)
 creds = flow.credentials
 
-        with open("token.pickle", "wb") as token:
+    with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
     return creds
