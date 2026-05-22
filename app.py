@@ -81,7 +81,7 @@ def fetch_emails():
 
     results = service.users().messages().list(
         userId="me",
-        maxResults=5,
+        maxResults=1,
         q="is:unread"
     ).execute()
 
