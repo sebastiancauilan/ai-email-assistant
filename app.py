@@ -72,7 +72,7 @@ creds = flow.credentials
 with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
-    return creds
+return creds
 
 
 # ---------------- FETCH + PROCESS EMAILS ----------------
