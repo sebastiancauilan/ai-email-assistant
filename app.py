@@ -58,10 +58,7 @@ def get_creds():
     SCOPES
 )
 
-            auth_url, _ = flow.authorization_url(
-    prompt="consent",
-    redirect_uri="https://ai-email-assistant-mdquphv63st8mjoo5yvfku.streamlit.app"
-)
+            auth_url, _ = flow.authorization_url(prompt="consent")
             st.link_button("Authorize Gmail", auth_url)
 
             code = st.text_input("Paste authorization code here")
